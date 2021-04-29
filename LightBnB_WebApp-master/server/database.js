@@ -88,7 +88,14 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
+  return pool
+  .query(
+    'SELECT * FROM reservations WHERE guest_id = $1 LIMIT $2', [ guest_id, limit ])
+  .then((result) => console.log('Reservations for guest ID:', result.rows))
+  .catch((err) => console.log(err.message));
+/** old original codes
   return getAllProperties(null, 2);
+*/
 }
 exports.getAllReservations = getAllReservations;
 
@@ -102,13 +109,50 @@ exports.getAllReservations = getAllReservations;
  */
 const getAllProperties = (options, limit = 10) => {
 
+  const queryParams = [];
+
+  let queryString = `
+  SELECT properties.*, avg(property_reviews.rating) as average_rating
+  FROM properties
+  JOIN property_reviews ON properties.id = property_id
+  `;
+
+  if (options.city) {
+    queryParams.push(`%${options.city}%`);
+    queryString += `WHERE city LIKE $${queryParams.length} `;
+  };
+  if (options.owner_id) {
+    queryParams.push(`%${options.owner_id}%`);
+    queryString += `WHERE owner_id = $${queryParams.length} `;
+  };
+  if (options.minimum_price_per_night && options.maximum_price_per_night) {
+    queryParams.push(`%${options.minimum_price_per_night}%`);
+    queryParams.push(`%${options.maximum_price_per_night}%`);
+    queryString += `WHERE cost_per_night >= $${queryParams.length - 1} AND cost_per_night <= $${queryParams.length}`;
+  };
+  if (options.minimum_rating) {
+    queryParams.push(`%${options.minimum_rating}%`);
+    queryString += `WHERE rating > $${queryParams.length} `;
+  };
+
+
+  queryParams.push(limit);
+  queryString += `
+  GROUP BY properties.id
+  ORDER BY cost_per_night
+  LIMIT $${queryParams.length};
+  `;
+  console.log(queryString, queryParams);
+  return pool.query(queryString, queryParams).then((res) => res.rows).catch((err) => console.log(err.message));
+
+
+  /** old codes for fetching in json:
   return pool
   .query(
     'SELECT * FROM properties LIMIT $1', [ limit ])
   .then((result) => console.log(result.rows))
   .catch((err) => console.log(err.message));
 
-/** old codes for fetching in json:
   const limitedProperties = {};
   for (let i = 1; i <= limit; i++) {
     limitedProperties[i] = properties[i];
