@@ -10,8 +10,8 @@ INSERT INTO users(name, email, password)
  ('2', 'Sweet Suite', 'description', 'wwww@', 'www@', '24', 1, 2, 2, 'Canada', 'Entimi', 'Toronto', 'Ontario', 'TR5428', TRUE);
 
 INSERT INTO reservations(start_date, end_date, property_id, guest_id)
- VALUES(2021-02-17, 2021-02-23, 1, 2),
- (2021-04-17, 2021-04-29, 2, 1);
+ VALUES('2021-02-17', '2021-02-23', 1, 2),
+ ('2021-04-17', '2021-04-29', 2, 1);
 
 INSERT INTO property_reviews(guest_id, property_id, reservation_id, rating, message)
-VALUES( 1, 2, 5, 'very good');
+VALUES( 1, 2, 1, 3, 'very good');
