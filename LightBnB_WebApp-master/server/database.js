@@ -51,7 +51,7 @@ const getUserWithId = function(id) {
   return pool
   .query(
     'SELECT * FROM users WHERE id = $1', [ id ])
-  .then((result) => result.rows)
+  .then((result) => result.rows[0])
   .catch((err) => console.log(err.message));
 /** old original codes
   return Promise.resolve(users[id]);
@@ -69,7 +69,7 @@ const addUser =  function(user) {
   return pool
   .query(
     'INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING id created', [ user.name, user.email, user.password ])
-  .then((result) => result.rows)
+  .then((result) => result.rows[0])
   .catch((err) => console.log(err.message));
 /** old original codes
   const userId = Object.keys(users).length + 1;
@@ -91,7 +91,7 @@ const getAllReservations = function(guest_id, limit = 10) {
   return pool
   .query(
     'SELECT * FROM reservations WHERE guest_id = $1 LIMIT $2', [ guest_id, limit ])
-  .then((result) => result.rows)
+  .then((result) => result.rows[0])
   .catch((err) => console.log(err.message));
 /** old original codes
   return getAllProperties(null, 2);
@@ -168,7 +168,7 @@ exports.getAllProperties = getAllProperties;
 const addProperty = function(property) {
   return pool
   .query(
-    'INSERT INTO properties(owner_id, title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street, city, province, post_code, country, parking_spaces, number_of_bathrooms, number_of_bedrooms) VALUES($1, $2, $3, $4, $5, $6 $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id created',
+    'INSERT INTO properties(owner_id, title, description, thumbnail_photo_url, cover_photo_url, cost_per_night, street, city, province, post_code, country, parking_spaces, number_of_bathrooms, number_of_bedrooms) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id created',
     [ property.owner_id, property.title, property.description, property.thumbnail_photo_url, property.cover_photo_url, property.cost_per_night, property.street, property.city, property.province, property.post_code, property.country, property.parking_spaces, property.number_of_bathrooms, property.number_of_bedrooms ])
   .then((result) => result.rows)
   .catch((err) => console.log(err.message));

@@ -12,7 +12,7 @@ module.exports = function(router, database) {
         res.send({error: "error"});
         return;
       }
-      req.session.userId = user.id;
+      req.session.userId = user.created;
       res.send("🤗");
     })
     .catch(e => res.send(e));
@@ -26,8 +26,8 @@ module.exports = function(router, database) {
   const login =  function(email, password) {
     return database.getUserWithEmail(email)
     .then(user => {
-      if (bcrypt.compareSync(password, user.password)) {
-        return user;
+      if (user.length && bcrypt.compareSync(password, user[0].password)) {
+        return user[0];
       }
       return null;
     });
@@ -47,7 +47,7 @@ module.exports = function(router, database) {
       })
       .catch(e => res.send(e));
   });
-  
+
   router.post('/logout', (req, res) => {
     req.session.userId = null;
     res.send({});
@@ -66,7 +66,7 @@ module.exports = function(router, database) {
           res.send({error: "no user with that id"});
           return;
         }
-    
+
         res.send({user: {name: user.name, email: user.email, id: userId}});
       })
       .catch(e => res.send(e));
